@@ -1,0 +1,1821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LoadRunner Enterprise Support Assistant - Troubleshooting Guide</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+        .header p {
+            margin: 10px 0 0 0;
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        .toc {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .toc h2 {
+            margin-top: 0;
+            color: #667eea;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .toc ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        .toc li {
+            margin: 8px 0;
+        }
+        .toc a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .toc a:hover {
+            text-decoration: underline;
+        }
+        .category {
+            background: white;
+            padding: 30px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .category h2 {
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        .issue {
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .issue:last-child {
+            border-bottom: none;
+        }
+        .issue h3 {
+            color: #333;
+            background: #f8f9fa;
+            padding: 12px;
+            border-left: 4px solid #dc3545;
+            margin-top: 0;
+        }
+        .issue h4 {
+            color: #667eea;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        .symptoms, .causes, .resolution, .escalation {
+            margin: 15px 0;
+        }
+        .symptoms ul, .causes ul, .resolution ol, .resolution ul {
+            margin: 5px 0;
+            padding-left: 25px;
+        }
+        .symptoms li, .causes li, .resolution li {
+            margin: 5px 0;
+        }
+        .error-badge {
+            display: inline-block;
+            background: #dc3545;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .severity {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .severity-high {
+            background: #dc3545;
+            color: white;
+        }
+        .severity-medium {
+            background: #ffc107;
+            color: #333;
+        }
+        .severity-low {
+            background: #28a745;
+            color: white;
+        }
+        .escalation {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #e83e8c;
+        }
+        .note {
+            background: #d1ecf1;
+            border-left: 4px solid #0c5460;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🚀 LoadRunner Enterprise Support Assistant</h1>
+        <p>Comprehensive troubleshooting guide for LoadRunner Enterprise technical issues</p>
+    </div>
+
+    <div class="toc">
+        <h2>📋 Table of Contents</h2>
+        <ul>
+            <li><a href="#load-generator-connection">1. Load Generator Connection Issues</a></li>
+            <li><a href="#script-upload">2. Script Upload & Deployment Issues</a></li>
+            <li><a href="#test-execution">3. Test Execution & Timeslot Issues</a></li>
+            <li><a href="#collation-analysis">4. Result Collation & Analysis Issues</a></li>
+            <li><a href="#license-issues">5. License Issues</a></li>
+            <li><a href="#script-replay">6. Script Replay Errors</a></li>
+            <li><a href="#linux-lg">7. Linux Load Generator Issues</a></li>
+            <li><a href="#firewall-network">8. Firewall & Network Issues</a></li>
+            <li><a href="#java-protocol">9. Java & Protocol-Specific Issues</a></li>
+            <li><a href="#infrastructure">10. Infrastructure & Resource Issues</a></li>
+        </ul>
+    </div>
+
+    <div id="load-generator-connection" class="category">
+        <h2>1. Load Generator Connection Issues</h2>
+
+        <div class="issue">
+            <h3><span class="error-badge">Error -10343</span> Communication error: Failed to connect to remote host <span class="severity severity-high">HIGH</span></h3>
+            
+            <div class="symptoms">
+                <h4>Symptoms:</h4>
+                <ul>
+                    <li>Cannot connect Controller to Load Generator</li>
+                    <li>Agent process appears to be running but connection fails</li>
+                    <li>Error message: "Failed to connect to remote host"</li>
+                    <li>Load Generator shows as disconnected in Controller</li>
+                </ul>
+            </div>
+
+            <div class="causes">
+                <h4>Root Causes:</h4>
+                <ul>
+                    <li>Version mismatch between Controller and Load Generator</li>
+                    <li>Network connectivity issues or firewall blocking required ports</li>
+                    <li>LoadRunner Agent service/process not running properly</li>
+                    <li>Multiple Network Interface Cards (NICs) causing routing confusion</li>
+                    <li>Hostname resolution issues</li>
+                </ul>
+            </div>
+
+            <div class="resolution">
+                <h4>Resolution Steps:</h4>
+                <ol>
+                    <li><strong>Verify versions match:</strong> Ensure the same LoadRunner version and Service Pack on both Controller and Load Generator machines</li>
+                    <li><strong>Check network connectivity:</strong> Verify bidirectional ping between Controller and Load Generator</li>
+                    <li><strong>Verify Agent is running:</strong> Check that LoadRunner Agent process or service is running on the remote Load Generator machine</li>
+                    <li><strong>Check firewall settings:</strong> Ensure ports 50500 and 54345 are not blocked by firewall</li>
+                    <li><strong>Verify hostname resolution:</strong> Add IP address and machine name to the hosts file on both machines if DNS resolution is problematic</li>
+                    <li><strong>Check for multiple NICs:</strong> If multiple network cards exist, configure which NIC to use for communication</li>
+                </ol>
+            </div>
+
+            <div class="escalation">
+                <strong>⚠️ Escalate to Core Team if:</strong> Issue persists after verifying all network settings and versions, or if infrastructure changes are required
+            </div>
+        </div>
+
+        <div class="issue">
+            <h3><span class="error-badge">Error -10344</span> Communication error: Failed to bind socket <span class="severity severity-high">HIGH</span></h3>
+            
+            <div class="symptoms">
+                <h4>Symptoms:</h4>
+                <ul>
+                    <li>Error message: "A process on the machine is already bound to the same address"</li>
+                    <li>LoadRunner Agent fails to start or cannot establish connection</li>
+                    <li>Two Way Communication Error: Function two_way_comm_create_acceptor failed</li>
+                </ul>
+            </div>
+
+            <div class="causes">
+                <h4>Root Causes:</h4>
+                <ul>
+                    <li>Port 54345 or 50500 is already in use by another process</li>
+                    <li>Previous LoadRunner process did not terminate cleanly</li>
+                    <li>Another application is using the required ports</li>
+                </ul>
+            </div>
+
+            <div class="resolution">
+                <h4>Resolution Steps:</h4>
+                <ol>
+                    <li><strong>Check port usage:</strong> Run <code>netstat -an</code> on the Load Generator and check if ports 54345 and 50500 are occupied</li>
+                    <li><strong>Identify the process:</strong> Use <code>netstat -anob</code> (Windows) to identify which process is using the port</li>
+                    <li><strong>Stop LoadRunner Agent:</strong> Stop the LoadRunner Agent service/process</li>
+                    <li><strong>Kill conflicting process:</strong> Terminate any process using port 54345 or 50500</li>
+                    <li><strong>Restart Agent:</strong> Start the LoadRunner Agent service/process again</li>
+                    <li><strong>Reboot if necessary:</strong> If ports remain occupied, reboot the Load Generator machine</li>
+                </ol>
+            </div>
+
+            <div class="escalation">
+                <strong>⚠️ Escalate to Core Team if:</strong> Ports are occupied by critical system services or you lack permissions to terminate processes
+            </div>
+        </div>
+
+        <div class="issue">
+            <h3>Load Generator Connected but lr_bridge Process Not Starting <span class="severity severity-medium">MEDIUM</span></h3>
+            
+            <div class="symptoms">
+                <h4>Symptoms:</h4>
+                <ul>
+                    <li>Agent icon turns green but connection still fails</li>
+                    <li>lr_bridge.exe process does not appear in Task Manager on Load Generator</li>
+                    <li>Cannot initialize Vusers on the Load Generator</li>
+                </ul>
+            </div>
+
+            <div class="causes">
+                <h4>Root Causes:</h4>
+                <ul>
+                    <li>Insufficient disk space on Load Generator</li>
+                    <li>Permissions issues preventing process creation</li>
+                    <li>LoadRunner temporary folder issues</li>
+                    <li>Antivirus or security software blocking process</li>
+                </ul>
+            </div>
+
+            <div class="resolution">
+                <h4>Resolution Steps:</h4>
+                <ol>
+                    <li><strong>Check disk space:</strong> Verify that the Load Generator has sufficient disk space, especially in the <code>temp</code> folder</li>
+                    <li><strong>Check temp folder:</strong> Verify <code>&lt;LoadRunner Install&gt;\temp</code> folder is not full</li>
+                    <li><strong>Clear temp files:</strong> Clean up old temporary files from LoadRunner temp directory</li>
+                    <li><strong>Check permissions:</strong> Ensure the LoadRunner Agent has proper permissions to create processes</li>
+                    <li><strong>Verify antivirus exclusions:</strong> Add LoadRunner directories to antivirus exclusion list</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="issue">
+            <h3>Load Generator Was Working, Now Suddenly Failing <span class="severity severity-high">HIGH</span></h3>
+            
+            <div class="symptoms">
+                <h4>Symptoms:</h4>
+                <ul>
+                    <li>Load Generator connected successfully for weeks, now failing</li>
+                    <li>No obvious changes made to configuration</li>
+                    <li>Error: Communication error - An error occurred while trying to create mutex (sys error message - No space left on device)</li>
+                </ul>
+            </div>
+
+            <div class="causes">
+                <h4>Root Causes:</h4>
+                <ul>
+                    <li>Disk space exhausted on Load Generator</li>
+                    <li>System resources (memory, file handles) exhausted</li>
+                    <li>LoadRunner Agent configuration changed unexpectedly</li>
+                    <li>Network configuration changes</li>
+                    <li>Security patches or updates applied</li>
+                </ul>
+            </div>
+
+            <div class="resolution">
+                <h4>Resolution Steps:</h4>
+                <ol>
+                    <li><strong>Check system resources:</strong> Verify disk space, memory, and CPU on Load Generator</li>
+                    <li><strong>Review recent changes:</strong> Check if any system updates, patches, or configuration changes were applied</li>
+                    <li><strong>Restart Agent:</strong> Stop and restart the LoadRunner Agent process/service</li>
+                    <li><strong>Check Agent Runtime Settings:</strong> Go to LoadRunner Agent Runtime Settings and verify "Allow Vusers without user login" option</li>
+                    <li><strong>Reboot Load Generator:</strong> If issue persists, reboot the Load Generator machine</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <div id="script-upload" class="category">
+        <h2>2. Script Upload & Deployment Issues</h2>
+
+        <div class="issue">
+            <h3>Script Upload Failed: Failed Downloading ALM Client <span class="severity severity-high">HIGH</span></h3>
+            
+            <div class="symptoms">
+                <h4>Symptoms:</h4>
+                <ul>
+                    <li>Error: "Failed Downloading ALM Client. Please check network connection and user network credentials"</li>
+                    <li>Script upload fails when trying to upload to LoadRunner Enterprise</li>
+                    <li>Error appears during ZIP file upload process</li>
+                </ul>
+            </div>
+
+            <div class="causes">
+                <h4>Root Causes:</h4>
+                <ul>
+                    <li>OTA (Open Test Architecture) client not initialized correctly on LoadRunner Enterprise server</li>
+                    <li>Network connectivity issues between client and LoadRunner Enterprise server</li>
+                    <li>User credentials issues</li>
+                    <li>LoadRunner Enterprise server configuration problems</li>
+                </ul>
+            </div>
+
+            <div class="resolution">
+                <h4>Resolution Steps:</h4>
+                <ol>
+                    <li><strong>Check server logs:</strong> Review LoadRunner Enterprise Server log.txt file in <code>&lt;PC Server&gt;\orchidtmp\LTLogger\HP.PCLTOP.QCOTAOperatioinServiceWrapper</code></li>
+                    <li><strong>Verify OTA client:</strong> Ensure OTA client is properly installed and configured</li>
+                    <li><strong>Check network connectivity:</strong> Verify network connection between workstation and LoadRunner Enterprise server</li>
+                    <li><strong>Verify credentials:</strong> Ensure user has proper permissions in LoadRunner Enterprise</li>
+                    <li><strong>Restart LoadRunner Enterprise services:</strong> Restart relevant LoadRunner Enterprise services on the server</li>
+                </ol>
+            </div>
+
+            <div class="escalation">
+                <strong>⚠️ Escalate to Core Team if:</strong> OTA client issues require server-side reconfiguration or if LoadRunner Enterprise services need restart
+            </div>
+        </div>
+
+        <div class="issue">
+            <h3>Getting "Only Zipped VuGen" Error When Uploading Script <span class="severity severity-medium">MEDIUM</span></h3>
+            
+            <div class="symptoms">
+                <h4>Symptoms:</h4>
+                <ul>
+                    <li>Error message indicates only zipped scripts are accepted</li>
+                    <li>Upload fails even though script is zipped</li>
+                </ul>
+            </div>
+
+            <div class="causes">
+                <h4>Root Causes:</h4>
+                <ul>
+                    <li>Script was not properly zipped from the correct root directory</li>
+                    <li>ZIP file structure is incorrect (script folder should be at root of ZIP)</li>
+                    <li>ZIP file is corrupted</li>
+                    <li>ZIP file contains extra folders or files not part of the script</li>
+                </ul>
+            </div>
+
+            <div class="resolution">
+                <h4>Resolution Steps:</h4>
+                <ol>
+                    <li><strong>Verify ZIP structure:</strong> Open the ZIP file and ensure the script folder (containing .usr, .prm, data files, etc.) is at the root level</li>
+                    <li><strong>Re-zip correctly:</strong> Navigate to the parent folder of your script folder, select the script folder, and create a new ZIP</li>
+                    <li><strong>Check file contents:</strong> Ensure all necessary script files (.usr, .c files, data files, .prm) are included</li>
+                    <li><strong>Test ZIP file:</strong> Extract the ZIP to a temporary location and verify it can be opened in VuGen before uploading</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="issue">
+            <h3>REST API Script Upload Returns Error 1001 <span class="severity severity-medium">MEDIUM</span></h3>
+            
+            <div class="symptoms">
+                <h4>Symptoms:</h4>
+                <ul>
+                    <li>HTTP Status Code 500 (Internal Server Error)</li>
+                    <li>Error Code: 1001, Exception Message: "Operation failed"</li>
+                    <li>Occurs when uploading script via REST API</li>
+                </ul>
+            </div>
+
+            <div class="causes">
+                <h4>Root Causes:</h4>
+                <ul>
+                    <li>Incorrect REST API syntax or parameters</li>
+                    <li>Authentication issues</li>
+                    <li>Project or domain path incorrect</li>
+                    <li>Script format not compatible</li>
+                </ul>
+            </div>
+
+            <div class="resolution">
+                <h4>Resolution Steps:</h4>
+                <ol>
+                    <li><strong>Verify REST API endpoint:</strong> Ensure correct URL format: <code>http://{server}/LoadTest/rest/domains/{domain}/projects/{project}/Scripts</code></li>
+                    <li><strong>Check authentication:</strong> Verify authentication token or Basic Auth credentials are correct</li>
+                    <li><strong>Verify HTTP method:</strong> Use POST method for script upload</li>
+                    <li><strong>Check script format:</strong> Ensure script is properly zipped before upload</li>
+                    <li><strong>Test with Postman:</strong> Use Postman or similar tool to test API call independently</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="issue">
+            <h3>Script Works in VuGen But Fails When Deployed from Controller <span class="severity severity-high">HIGH</span></h3>
+            
+            <div class="symptoms">
+                <h4>Symptoms:</h4>
+                <ul>
+                    <li>Script runs successfully in VuGen</li>
+                    <li>Same script fails when executed from Controller or LoadRunner Enterprise</li>
+                    <li>May see parameter file errors or missing data file errors</li>
+                </ul>
+            </div>
+
+            <div class="causes">
+                <h4>Root Causes:</h4>
+                <ul>
+                    <li>Parameter files using different case sensitivity</li>
+                    <li>File paths not correctly referenced</li>
+                    <li>Data files not included in script upload</li>
+                    <li>Runtime settings differences between VuGen and Controller</li>
+                </ul>
+            </div>
+
+            <div class="resolution">
+                <h4>Resolution Steps:</h4>
+                <ol>
+                    <li><strong>Check parameter file names:</strong> Ensure all parameter file references use consistent case (LoadRunner Enterprise is case-sensitive)</li>
+                    <li><strong>Verify .prm file:</strong> Check that ScriptName.prm file references parameters with correct case</li>
+                    <li><strong>Remove spaces from file names:</strong> Ensure no spaces in parameter file names (spaces work in VuGen but not LoadRunner Enterprise)</li>
+                    <li><strong>Verify TableLocation:</strong> If TableLocation in .prm is not "Local", ensure parameter file exists in specified path</li>
+                    <li><strong>Include all data files:</strong> Ensure all external data files are included in the script ZIP</li>
+                    <li><strong>Check runtime settings:</strong> Compare runtime settings between VuGen and Controller scenario</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <div id="test-execution" class="category">
+        <h2>3. Test Execution & Timeslot Issues</h2>
+
+        <div class="issue">
+            <h3>Autostart Timeslot Reserved But Test Didn't Start <span class="severity severity-high">HIGH</span></h3>
+            
+            <div class="symptoms">
+                <h4>Symptoms:</h4>
+                <ul>
+                    <li>Timeslot was scheduled for autostart but test run did not begin</li>
+                    <li>Timeslot shows as complete but no test execution occurred</li>
+                    <li>No error message visible in UI</li>
+                </ul>
+            </div>
+
+            <div class="causes">
+                <h4>Root Causes:</h4>
+                <ul>
+                    <li>Timeslot became invalid due to host allocation problems</li>
+                    <li>License issues prevented test from starting</li>
+                    <li>Performance test became invalid (script changes, allocation errors)</li>
+                    <li>Autostart option was not properly enabled</li>
+                    <li>System stopped trying to run after autostart window expired</li>
+                </ul>
+            </div>
+
+            <div class="resolution">
+                <h4>Resolution Steps:</h4>
+                <ol>
+                    <li><strong>Open timeslot:</strong> In Timeslots module, double-click the timeslot to view failure reason</li>
+                    <li><strong>Check autostart setting:</strong> Verify "Automatically" option was checked when reserving timeslot</li>
+                    <li><strong>Review host allocation:</strong> Check if all required hosts were available during timeslot window</li>
+                    <li><strong>Verify test validity:</strong> Open the test in Test Management and check for errors in design page</li>
+                    <li><strong>Check license availability:</strong> Verify project has sufficient license allocation</li>
+                    <li><strong>Calculate availability:</strong> Click "Calculate Availability" on the timeslot to see if it's valid</li>
+                </ol>
+            </div>
+
+            <div class="escalation">
+                <strong>⚠️ Escalate to Core Team if:</strong> Host allocation issues require infrastructure changes or license adjustments are needed
+            </div>
+        </div>
+
+        <div class="issue">
+            <h3>Timeslot Became Invalid Due to Host Allocation Problem <span class="severity severity-high">HIGH</span></h3>
+            
+            <div class="symptoms">
+                <h4>Symptoms:</h4>
+                <ul>
+                    <li>Timeslot shows as invalid</li>
+                    <li>Error indicates host allocation failure</li>
+                    <li>System could not allocate all requested resources</li>
+                </ul>
+            </div>
+
+            <div class="causes">
+                <h4>Root Causes:</h4>
+                <ul>
+                    <li>Changes in host properties or status</li>
+                    <li>Host assignment to pools changed</li>
+                    <li>Pool assignment to project modified</li>
+                    <li>Not enough available hosts matching requirements</li>
+                    <li>Host became non-operational</li>
+                </ul>
+            </div>
+
+            <div class="resolution">
+                <h4>Resolution Steps:</h4>
+                <ol>
+                    <li><strong>Check host status:</strong> In LoadRunner Enterprise Administration, go to Maintenance > Hosts and verify host status</li>
+                    <li><strong>Review Event Logs:</strong> Click the host and check Event Logs for PC_hostChangeStateSuccess and PC_hostChangeStatusSuccess events</li>
+                    <li><strong>Verify host pools:</strong> Ensure required hosts are assigned to correct pools</li>
+                    <li><strong>Check pool assignments:</strong> Verify pools are assigned to your project</li>
+                    <li><strong>Calculate availability:</strong> Try to recalculate timeslot availability to see if system can reshuffle hosts</li>
+                </ol>
+            </div>
+
+            <div class="escalation">
+                <strong>⚠️ Escalate to Core Team if:</strong> Host configuration changes are needed or hosts are down and require infrastructure team intervention
+            </div>
+        </div>
+
+        <div class="issue">
+            <h3>Test Run Failed - License Issue <span class="severity severity-high">HIGH</span></h3>
+            
+            <div class="symptoms">
+                <h4>Symptoms:</h4>
+                <ul>
+                    <li>Test fails to start citing license issues</li>
+                    <li>Timeslot became invalid due to license changes</li>
+                    <li>Error indicates insufficient Vuser licenses</li>
+                </ul>
+            </div>
+
+            <div class="causes">
+                <h4>Root Causes:</h4>
+                <ul>
+                    <li>Project limits changed after timeslot was reserved</li>
+                    <li>LoadRunner Enterprise license pool exhausted</li>
+                    <li>License allocation changed by administrator</li>
+                    <li>Concurrent tests consuming available licenses</li>
+                </ul>
+            </div>
+
+            <div class="resolution">
+                <h4>Resolution Steps:</h4>
+                <ol>
+                    <li><strong>Check project limits:</strong> Review current project Vuser allocation</li>
+                    <li><strong>Verify license availability:</strong> Check LoadRunner Enterprise license usage across all projects</li>
+                    <li><strong>Review concurrent tests:</strong> Check if other tests are running and consuming licenses</li>
+                    <li><strong>Contact administrator:</strong> Request license reallocation if needed</li>
+                </ol>
+            </div>
+
+            <div class="escalation">
+                <strong>⚠️ Escalate to Core Team if:</strong> License reallocation or purchase of additional licenses is required
+            </div>
+        </div>
+
+        <div class="issue">
+            <h3>Performance Test Became Invalid During Timeslot <span class="severity severity-medium">MEDIUM</span></h3>
+            
+            <div class="symptoms">
+                <h4>Symptoms:</h4>
+                <ul>
+                    <li>Error indicates performance test is invalid</li>
+                    <li>Test was valid when timeslot was created but became invalid later</li>
+                </ul>
+            </div>
+
+            <div class="causes">
+                <h4>Root Causes:</h4>
+                <ul>
+                    <li>Someone modified the performance test after timeslot reservation</li>
+                    <li>Error in allocation of load generators to groups</li>
+                    <li>Changes to scripts connected to the test</li>
+                    <li>Script became unavailable or was deleted</li>
+                </ul>
+            </div>
+
+            <div class="resolution">
+                <h4>Resolution Steps:</h4>
+                <ol>
+                    <li><strong>Open test design:</strong> Go to Test Management, open the test, and check the design page for errors</li>
+                    <li><strong>Verify script availability:</strong> Ensure all scripts assigned to the test still exist and are accessible</li>
+                    <li><strong>Check load generator allocation:</strong> Verify load generators are properly allocated to script groups</li>
+                    <li><strong>Fix validation errors:</strong> Resolve any errors shown in the test design page</li>
+                    <li><strong>Re-save test:</strong> After fixing errors, save the test and verify it validates successfully</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <div id="collation-analysis" class="category">
+        <h2>4. Result Collation & Analysis Issues</h2>
+
+        <div class="issue">
+            <h3>Failed to Collate Results - Timeout Exceeded <span class="severity severity-high">HIGH</span></h3>
+            
+            <div class="symptoms">
+                <h4>Symptoms:</h4>
+                <ul>
+                    <li>Error: "Failed to collate results. Reason: 'Failed to collate. Timeout exceeded'"</li>
+                    <li>Typically occurs after long-duration tests (8+ hours, 24+ hours)</li>
+                    <li>Collation process starts but never completes</li>
+                </ul>
+            </div>
+
+            <div class="causes">
+                <h4>Root Causes:</h4>
+                <ul>
+                    <li>Default collate timeout (5 minutes) insufficient for large result sets</li>
+                    <li>Very large test results requiring more processing time</li>
+                    <li>Network delays between load generators and LoadRunner Enterprise server</li>
+                    <li>Connectivity issues during collation process</li>
+                </ul>
+            </div>
+
+            <div class="resolution">
+                <h4>Resolution Steps:</h4>
+                <ol>
+                    <li><strong>Increase collate timeout:</strong>
+                        <ul>
+                            <li>Login to project at http://&lt;LRE_Server&gt;:8080/qcbin</li>
+                            <li>Go to Tools > Performance Center Controller Options > Run Results > Collate Settings > Timeout</li>
+                            <li>Increase "Collate timeout in minutes" to a larger value (e.g., 30 or 60 minutes)</li>
+                        </ul>
+                    </li>
+                    <li><strong>Retry collation:</strong> After increasing timeout, retry the collation process</li>
+                    <li><strong>Manual collation:</strong> If automatic collation continues to fail, try manual collation from Controller</li>
+                    <li><strong>Check network:</strong> Verify stable network connectivity between load generators and server</li>
+                </ol>
+            </div>
+
+            <div class="note">
+                <strong>💡 Prevention:</strong> For long-duration tests (12+ hours), proactively increase the collate timeout before running the test.
+            </div>
+
+            <div class="escalation">
+                <strong>⚠️ Escalate to Core Team if:</strong> Collation continues to fail even with increased timeout, or if server resources are insufficient for processing large result sets
+            </div>
+        </div>
+
+        <div class="issue">
+            <h3>Analysis Error: Process HP.PC.AnalysisWrapper Abnormally Terminated <span class="severity severity-high">HIGH</span></h3>
+            
+            <div class="symptoms">
+                <h4>Symptoms:</h4>
+                <ul>
+                    <li>Error: "Result analysis critical error. Reason: 'Process HP.PC.AnalysisWrapper abnormally terminated'"</li>
+                    <li>Occurs after collation completes, during analysis phase</li>
+                    <li>Analysis process crashes before completing</li>
+                </ul>
+            </div>
+
+            <div class="causes">
+                <h4>Root Causes:</h4>
+                <ul>
+                    <li>Insufficient memory on LoadRunner Enterprise server or Analysis machine</li>
+                    <li>Very large result sets overwhelming Analysis process</li>
+                    <li>Corrupted result data</li>
+                    <li>Analysis timeout too short for large datasets</li>
+                </ul>
+            </div>
+
+            <div class="resolution">
+                <h4>Resolution Steps:</h4>
+                <ol>
+                    <li><strong>Check server resources:</strong> Verify available memory and disk space on LoadRunner Enterprise server</li>
+                    <li><strong>Increase analysis timeout:</strong> Adjust analysis timeout settings in project configuration</li>
+                    <li><strong>Download results locally:</strong> Download raw results and try analyzing locally using Analysis application</li>
+                    <li><strong>Break down analysis:</strong> Try analyzing smaller time ranges of the test if possible</li>
+                    <li><strong>Check result integrity:</strong> Verify no .eve files are missing from load generator results</li>
+                </ol>
+            </div>
+
+            <div class="escalation">
+                <strong>⚠️ Escalate to Core Team if:</strong> Server memory or resources need to be increased, or if Analysis server configuration requires changes
+            </div>
+        </div>
+
+        <div class="issue">
+            <h3>EVE File Missing from Load Generator Causing Collation Failure <span class="severity severity-high">HIGH</span></h3>
+            
+            <div class="symptoms">
+                <h4>Symptoms:</h4>
+                <ul>
+                    <li>Automatic collation fails</li>
+                    <li>Manual collation from raw results also fails</li>
+                    <li>When checking raw results in Controller orchidtemp folder, .eve file from one Load Generator is missing</li>
+                    <li>Incomplete data from specific load generator</li>
+                </ul>
+            </div>
+
+            <div class="causes">
+                <h4>Root Causes:</h4>
+                <ul>
+                    <li>Load Generator crashed or stopped responding during test</li>
+                    <li>Disk space exhausted on Load Generator during test execution</li>
+                    <li>Network interruption prevented file transfer</li>
+                    <li>Load Generator process terminated prematurely</li>
+                </ul>
+            </div>
+
+            <div class="resolution">
+                <h4>Resolution Steps:</h4>
+                <ol>
+                    <li><strong>Check Load Generator logs:</strong> Review logs on the Load Generator that has missing .eve file</li>
+                    <li><strong>Verify disk space:</strong> Check if Load Generator ran out of disk space during test</li>
+                    <li><strong>Review test execution logs:</strong> Check Controller logs for any Load Generator errors during test</li>
+                    <li><strong>Partial analysis:</strong> If one LG's data is missing, analyze results from other LGs only (partial results)</li>
+                    <li><strong>Document for future:</strong> Identify root cause to prevent recurrence in next test</li>
+                </ol>
+            </div>
+
+            <div class="escalation">
+                <strong>⚠️ Escalate to Core Team if:</strong> Load Generator infrastructure issues need to be resolved, or if test needs to be re-run
+            </div>
+        </div>
+
+        <div class="issue">
+            <h3>Collation Fails on Linux Load Generators <span class="severity severity-medium">MEDIUM</span></h3>
+            
+            <div class="symptoms">
+                <h4>Symptoms:</h4>
+                <ul>
+                    <li>Collation succeeds for Windows Load Generators but fails for Linux LGs</li>
+                    <li>Results from Linux machines not included in final analysis</li>
+                </ul>
+            </div>
+
+            <div class="causes">
+                <h4>Root Causes:</h4>
+                <ul>
+                    <li>File permission issues on Linux Load Generator</li>
+                    <li>Results directory not accessible from LoadRunner Enterprise server</li>
+                    <li>SSH/network connectivity issues</li>
+                    <li>Case-sensitivity issues with file names</li>
+                </ul>
+            </div>
+
+            <div class="resolution">
+                <h4>Resolution Steps:</h4>
+                <ol>
+                    <li><strong>Check file permissions:</strong> Verify result files on Linux LG have correct read permissions</li>
+                    <li><strong>Verify network access:</strong> Ensure LoadRunner Enterprise server can access Linux LG results directory</li>
+                    <li><strong>Check SSH connectivity:</strong> Verify SSH connection from LoadRunner Enterprise server to Linux LG</li>
+                    <li><strong>Review agent logs:</strong> Check m_agent_daemon logs on Linux Load Generator</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <div id="license-issues" class="category">
+        <h2>5. License Issues</h2>
+
+        <div class="issue">
+            <h3>No Valid Licenses Available Despite License Utility Showing Active License <span class="severity severity-high">HIGH</span></h3>
+            
+            <div class="symptoms">
+                <h4>Symptoms:</h4>
+                <ul>
+                    <li>Controller shows "No valid licenses" error</li>
+                    <li>License Utility shows license is active and valid</li>
+                    <li>License suddenly stopped working after Controller was closed and reopened</li>
+                    <li>Issue appears randomly even with valid license</li>
+                </ul>
+            </div>
+
+            <div class="causes">
+                <h4>Root Causes:</h4>
+                <ul>
+                    <li>License service not running properly</li>
+                    <li>License cache corruption</li>
+                    <li>Communication issue between Controller and License service</li>
+                    <li>Temporary license service glitch</li>
+                </ul>
+            </div>
+
+            <div class="resolution">
+                <h4>Resolution Steps:</h4>
+                <ol>
+                    <li><strong>Restart License service:</strong>
+                        <ul>
+                            <li>Open Services (services.msc)</li>
+                            <li>Find LoadRunner/Performance Center License service</li>
+                            <li>Restart the service</li>
+                        </ul>
+                    </li>
+                    <li><strong>Restart Controller:</strong> Close and reopen LoadRunner Controller</li>
+                    <li><strong>Verify license location:</strong> Check that license file location is correctly configured</li>
+                    <li><strong>Re-apply license:</strong> In License Utility, try removing and re-adding the license</li>
+                    <li><strong>Temporary workaround:</strong> If issue persists, try uninstalling and reinstalling LoadRunner components</li>
+                </ol>
+            </div>
+
+            <div class="escalation">
+                <strong>⚠️ Escalate to Core Team if:</strong> License service restart doesn't resolve issue, or if license server configuration needs review
+            </div>
+        </div>
+
+        <div class="issue">
+            <h3>License Exceeded During Test Execution <span class="severity severity-high">HIGH</span></h3>
+            
+            <div class="symptoms">
+                <h4>Symptoms:</h4>
+                <ul>
+                    <li>Test starts successfully but fails mid-execution</li>
+                    <li>Error message indicates license limit exceeded</li>
+                    <li>Some Vusers fail to initialize</li>
+                </ul>
+            </div>
+
+            <div class="causes">
+                <h4>Root Causes:</h4>
+                <ul>
+                    <li>Other concurrent tests consuming licenses</li>
+                    <li>Test configured for more Vusers than license allows</li>
+                    <li>Project allocation exceeded</li>
+                    <li>License pool exhausted across multiple projects</li>
+                </ul>
+            </div>
+
+            <div class="resolution">
+                <h4>Resolution Steps:</h4>
+                <ol>
+                    <li><strong>Check concurrent tests:</strong> Verify if other tests are running and using licenses</li>
+                    <li><strong>Review license allocation:</strong> Check total Vuser licenses available vs. requested</li>
+                    <li><strong>Reduce Vuser count:</strong> Adjust test scenario to use fewer Vusers within license limit</li>
+                    <li><strong>Schedule accordingly:</strong> Coordinate test execution to avoid license conflicts</li>
+                </ol>
+            </div>
+
+            <div class="escalation">
+                <strong>⚠️ Escalate to Core Team if:</strong> Additional licenses need to be purchased or license allocation needs adjustment
+            </div>
+        </div>
+
+        <div class="issue">
+            <h3>License Server Not Reachable <span class="severity severity-high">HIGH</span></h3>
+            
+            <div class="symptoms">
+                <h4>Symptoms:</h4>
+                <ul>
+                    <li>Error indicating cannot connect to license server</li>
+                    <li>All LoadRunner components unable to check out licenses</li>
+                    <li>VuGen, Controller, and Analysis all fail to start</li>
+                </ul>
+            </div>
+
+            <div class="causes">
+                <h4>Root Causes:</h4>
+                <ul>
+                    <li>License server is down</li>
+                    <li>Network connectivity issues</li>
+                    <li>Firewall blocking license server port</li>
+                    <li>License server service not running</li>
+                </ul>
+            </div>
+
+            <div class="resolution">
+                <h4>Resolution Steps:</h4>
+                <ol>
+                    <li><strong>Ping license server:</strong> Verify network connectivity to license server</li>
+                    <li><strong>Check license server status:</strong> Verify license server service is running</li>
+                    <li><strong>Check firewall:</strong> Ensure firewall allows connection to license server port</li>
+                    <li><strong>Verify license configuration:</strong> Check license server address is correctly configured in LoadRunner</li>
+                </ol>
+            </div>
+
+            <div class="escalation">
+                <strong>⚠️ Escalate to Core Team:</strong> This requires immediate escalation as it affects all LoadRunner users
+            </div>
+        </div>
+    </div>
+
+    <div id="script-replay" class="category">
+        <h2>6. Script Replay Errors</h2>
+
+        <div class="issue">
+            <h3><span class="error-badge">Error -26612</span> HTTP Status Code 403 (Forbidden) <span class="severity severity-high">HIGH</span></h3>
+            
+            <div class="symptoms">
+                <h4>Symptoms:</h4>
+                <ul>
+                    <li>Script replay fails with Error -26612</li>
+                    <li>HTTP response shows 403 Forbidden status</li>
+                    <li>Script may have worked during recording but fails during replay</li>
+                </ul>
+            </div>
+
+            <div class="causes">
+                <h4>Root Causes:</h4>
+                <ul>
+                    <li>Authentication failure - session not properly maintained</li>
+                    <li>Missing or incorrect correlation of security tokens</li>
+                    <li>Server rejecting request due to invalid credentials</li>
+                    <li>IP restrictions on server side</li>
+                    <li>Missing required headers or cookies</li>
+                </ul>
+            </div>
+
+            <div class="resolution">
+                <h4>Resolution Steps:</h4>
+                <ol>
+                    <li><strong>Review authentication:</strong> Verify login credentials are correct and properly parameterized</li>
+                    <li><strong>Check correlation:</strong> Look for dynamic values that need to be correlated (session IDs, tokens, etc.)</li>
+                    <li><strong>Compare recording vs replay:</strong> Use "Recording & Replay Comparison" in VuGen to identify differences</li>
+                    <li><strong>Add correlation rules:</strong> Correlate all dynamic values found in responses</li>
+                    <li><strong>Verify headers:</strong> Ensure all necessary headers are being sent</li>
+                    <li><strong>Check cookies:</strong> Verify cookie handling is enabled and working correctly</li>
+                </ol>
+            </div>
+
+            <div class="note">
+                <strong>💡 Tip:</strong> Use VuGen's automatic correlation feature first, then manually review for missed correlations
+            </div>
+        </div>
+
+        <div class="issue">
+            <h3><span class="error-badge">Error -27732</span> Internal Error - Can't Parse Username <span class="severity severity-medium">MEDIUM</span></h3>
+            
+            <div class="symptoms">
+                <h4>Symptoms:</h4>
+                <ul>
+                    <li>Error: "Internal Error - can't parse username"</li>
+                    <li>Or: "Internal Error - can't get initial credentials for username/password"</li>
+                    <li>Occurs during script replay, particularly with integrated authentication</li>
+                </ul>
+            </div>
+
+            <div class="causes">
+                <h4>Root Causes:</h4>
+                <ul>
+                    <li>Integrated Windows authentication not configured properly</li>
+                    <li>Credentials in web_set_user function are invalid or expired</li>
+                    <li>Authentication scheme mismatch</li>
+                </ul>
+            </div>
+
+            <div class="resolution">
+                <h4>Resolution Steps:</h4>
+                <ol>
+                    <li><strong>Verify credentials:</strong> Check that username and password in web_set_user are still valid</li>
+                    <li><strong>Check authentication type:</strong> Verify correct authentication scheme (NTLM, Basic, Digest, etc.)</li>
+                    <li><strong>Update web_set_user:</strong> Ensure correct syntax:
+                        <code>web_set_user("username", "password", "host:port");</code>
+                    </li>
+                    <li><strong>Test authentication manually:</strong> Verify credentials work in browser</li>
+                    <li><strong>Check domain requirements:</strong> For Windows auth, may need to include domain: "DOMAIN\\username"</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="issue">
+            <h3>SSL Protocol Error <span class="severity severity-high">HIGH</span></h3>
+            
+            <div class="symptoms">
+                <h4>Symptoms:</h4>
+                <ul>
+                    <li>Error: "SSL protocol error when attempting to connect with host"</li>
+                    <li>Error: "SSL State: error in SSLv3 write client certificate"</li>
+                    <li>Occurs when replaying scripts with HTTPS/SSL</li>
+                </ul>
+            </div>
+
+            <div class="causes">
+                <h4>Root Causes:</h4>
+                <ul>
+                    <li>SSL certificate issues</li>
+                    <li>Certificate not properly imported into LoadRunner</li>
+                    <li>Certificate hierarchy incomplete</li>
+                    <li>SSL version mismatch</li>
+                </ul>
+            </div>
+
+            <div class="resolution">
+                <h4>Resolution Steps:</h4>
+                <ol>
+                    <li><strong>Import certificates:</strong> Add all certificates in the certificate hierarchy to a .pem file</li>
+                    <li><strong>Configure SSL settings:</strong> In Runtime Settings > Network > SSL:
+                        <ul>
+                            <li>Enable SSL</li>
+                            <li>Point to .pem file location</li>
+                            <li>Configure SSL version if needed</li>
+                        </ul>
+                    </li>
+                    <li><strong>Disable webpage breakdown:</strong> If using HTTPS with proxy server:
+                        <ul>
+                            <li>In Runtime Settings > Internet Protocol > Preferences</li>
+                            <li>Uncheck "Enable webpage breakdown"</li>
+                        </ul>
+                    </li>
+                    <li><strong>Try WinInet:</strong> If recorded with WinInet, use WinInet Replay Engine in Runtime Settings</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="issue">
+            <h3><span class="error-badge">Error -27792</span> Failed to Connect to Server - Connection Refused <span class="severity severity-medium">MEDIUM</span></h3>
+            
+            <div class="symptoms">
+                <h4>Symptoms:</h4>
+                <ul>
+                    <li>Error: "Failed to connect to server [server:port] [10061] Connection Refused"</li>
+                    <li>Script cannot establish connection to target server</li>
+                </ul>
+            </div>
+
+            <div class="causes">
+                <h4>Root Causes:</h4>
+                <ul>
+                    <li>Target server is down or unreachable</li>
+                    <li>Firewall blocking connection</li>
+                    <li>Port is closed or not listening</li>
+                    <li>Network routing issues</li>
+                    <li>Server hostname resolution failure</li>
+                </ul>
+            </div>
+
+            <div class="resolution">
+                <h4>Resolution Steps:</h4>
+                <ol>
+                    <li><strong>Verify server is up:</strong> Confirm target application is running and accessible</li>
+                    <li><strong>Test connectivity:</strong> Try pinging server and telnet to specific port</li>
+                    <li><strong>Check DNS resolution:</strong> Verify hostname resolves to correct IP address</li>
+                    <li><strong>Check firewall:</strong> Ensure firewall rules allow connection from Load Generator</li>
+                    <li><strong>Verify URL:</strong> Confirm server URL and port are correct in script</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="issue">
+            <h3>Transaction Not Found Error <span class="severity severity-low">LOW</span></h3>
+            
+            <div class="symptoms">
+                <h4>Symptoms:</h4>
+                <ul>
+                    <li>Error message indicates transaction not found</li>
+                    <li>Results show missing transactions</li>
+                    <li>Transaction names appear incorrect in Controller</li>
+                </ul>
+            </div>
+
+            <div class="causes">
+                <h4>Root Causes:</h4>
+                <ul>
+                    <li>lr_start_transaction and lr_end_transaction mismatch</li>
+                    <li>Transaction name typo or inconsistency</li>
+                    <li>Missing end transaction statement</li>
+                    <li>Code logic error causing transaction to not execute</li>
+                </ul>
+            </div>
+
+            <div class="resolution">
+                <h4>Resolution Steps:</h4>
+                <ol>
+                    <li><strong>Verify transaction names:</strong> Check that lr_start_transaction and lr_end_transaction use exact same name</li>
+                    <li><strong>Check for missing end:</strong> Ensure every start transaction has corresponding end transaction</li>
+                    <li><strong>Review code flow:</strong> Verify transaction code path executes under test conditions</li>
+                    <li><strong>Check nesting:</strong> Ensure transactions are not incorrectly nested</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <div id="linux-lg" class="category">
+        <h2>7. Linux Load Generator Issues</h2>
+
+        <div class="issue">
+            <h3>verify_generator Fails with $M_LROOT Not Set <span class="severity severity-high">HIGH</span></h3>
+            
+            <div class="symptoms">
+                <h4>Symptoms:</h4>
+                <ul>
+                    <li>Running verify_generator.sh fails</li>
+                    <li>Error: "Verify $M_LROOT ...Failed"</li>
+                    <li>Message indicates $M_LROOT is not set or cannot be determined</li>
+                    <li>Error: "Failed to load client QTWeb"</li>
+                </ul>
+            </div>
+
+            <div class="causes">
+                <h4>Root Causes:</h4>
+                <ul>
+                    <li>$M_LROOT environment variable not set in shell configuration</li>
+                    <li>Error in shell dot files preventing variable from being set</li>
+                    <li>Conditional code in shell files setting variable only for certain shells</li>
+                    <li>LoadRunner installation path not properly configured</li>
+                </ul>
+            </div>
+
+            <div class="resolution">
+                <h4>Resolution Steps:</h4>
+                <ol>
+                    <li><strong>Set M_LROOT manually:</strong>
+                        <code>export M_LROOT=/opt/HP/LoadRunner</code> (adjust path as needed)
+                    </li>
+                    <li><strong>Add to shell profile:</strong> Edit ~/.bashrc or ~/.bash_profile and add:
+                        <code>export M_LROOT=/opt/HP/LoadRunner</code>
+                    </li>
+                    <li><strong>Fix vuserchk.sh:</strong> Edit the vuserchk.sh file referenced by verify_generator.sh and ensure M_LROOT is set</li>
+                    <li><strong>Source the file:</strong> Run <code>source ~/.bashrc</code> to apply changes</li>
+                    <li><strong>Re-run verify:</strong> Execute verify_generator.sh again</li>
+                </ol>
+            </div>
+
+            <div class="note">
+                <strong>💡 Note:</strong> The verify_generator.sh script should be run after LoadRunner installation is complete on Linux
+            </div>
+        </div>
+
+        <div class="issue">
+            <h3>Linux Load Generator Added But Run Fails at "Connect to LG" Step <span class="severity severity-high">HIGH</span></h3>
+            
+            <div class="symptoms">
+                <h4>Symptoms:</h4>
+                <ul>
+                    <li>Linux Load Generator successfully added to Lab Management</li>
+                    <li>m_agent_daemon process is running on Linux</li>
+                    <li>Test initiation fails at "Connecting to LGs" step</li>
+                </ul>
+            </div>
+
+            <div class="causes">
+                <h4>Root Causes:</h4>
+                <ul>
+                    <li>Incorrect credentials provided during LG setup</li>
+                    <li>SSH connectivity issues</li>
+                    <li>RSH not properly configured or disabled</li>
+                    <li>File permissions on Linux preventing access</li>
+                    <li>.rhosts file missing or misconfigured</li>
+                </ul>
+            </div>
+
+            <div class="resolution">
+                <h4>Resolution Steps:</h4>
+                <ol>
+                    <li><strong>Verify credentials:</strong> Ensure Linux account username and password are correct</li>
+                    <li><strong>Create .rhosts file:</strong> In user's home directory, create .rhosts file with proper entries</li>
+                    <li><strong>Check SSH config:</strong> Verify SSH is enabled and accessible from LoadRunner Enterprise server</li>
+                    <li><strong>Test SSH connection:</strong> Manually SSH from LoadRunner Enterprise server to Linux LG</li>
+                    <li><strong>Check agent daemon:</strong> Verify m_agent_daemon is running: <code>ps -ef | grep m_agent</code></li>
+                    <li><strong>Review agent logs:</strong> Check logs in LoadRunner installation directory for connection errors</li>
+                </ol>
+            </div>
+
+            <div class="escalation">
+                <strong>⚠️ Escalate to Core Team if:</strong> SSH configuration requires system-level changes or if RSH needs to be enabled/configured
+            </div>
+        </div>
+
+        <div class="issue">
+            <h3>Linux LG: "No Space Left on Device" Error <span class="severity severity-high">HIGH</span></h3>
+            
+            <div class="symptoms">
+                <h4>Symptoms:</h4>
+                <ul>
+                    <li>Error: "An error occurred while trying to create mutex (sys error message - No space left on device)"</li>
+                    <li>Load Generator fails to execute Vusers</li>
+                    <li>Test fails mid-execution</li>
+                </ul>
+            </div>
+
+            <div class="causes">
+                <h4>Root Causes:</h4>
+                <ul>
+                    <li>Linux Load Generator disk space exhausted</li>
+                    <li>Temporary directory full</li>
+                    <li>Result files consuming all available space</li>
+                </ul>
+            </div>
+
+            <div class="resolution">
+                <h4>Resolution Steps:</h4>
+                <ol>
+                    <li><strong>Check disk space:</strong> Run <code>df -h</code> to view disk usage</li>
+                    <li><strong>Clean temp directories:</strong> Remove old temporary files and test results</li>
+                    <li><strong>Clear LoadRunner temp:</strong> Clean LoadRunner temp directory: <code>rm -rf $M_LROOT/temp/*</code></li>
+                    <li><strong>Archive old results:</strong> Move or delete old test results from previous runs</li>
+                    <li><strong>Increase disk space:</strong> If consistently running out, allocate more disk space to the partition</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="issue">
+            <h3>Linux LG File Permission Issues <span class="severity severity-medium">MEDIUM</span></h3>
+            
+            <div class="symptoms">
+                <h4>Symptoms:</h4>
+                <ul>
+                    <li>Cannot write to directories on Linux Load Generator</li>
+                    <li>Script files cannot be created or modified</li>
+                    <li>Result files not being generated</li>
+                </ul>
+            </div>
+
+            <div class="causes">
+                <h4>Root Causes:</h4>
+                <ul>
+                    <li>LoadRunner directories have incorrect permissions</li>
+                    <li>User account running agent lacks necessary permissions</li>
+                    <li>SELinux restrictions</li>
+                </ul>
+            </div>
+
+            <div class="resolution">
+                <h4>Resolution Steps:</h4>
+                <ol>
+                    <li><strong>Check ownership:</strong> Verify LoadRunner directories are owned by correct user</li>
+                    <li><strong>Fix permissions:</strong> Run <code>chmod -R 755 $M_LROOT</code> (adjust as needed)</li>
+                    <li><strong>Check SELinux:</strong> If SELinux is enabled, check for denials: <code>grep denied /var/log/audit/audit.log</code></li>
+                    <li><strong>Verify user:</strong> Ensure agent is running as user with appropriate permissions</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <div id="firewall-network" class="category">
+        <h2>8. Firewall & Network Issues</h2>
+
+        <div class="issue">
+            <h3>Running Vusers Over Firewall - Decryption Failed <span class="severity severity-high">HIGH</span></h3>
+            
+            <div class="symptoms">
+                <h4>Symptoms:</h4>
+                <ul>
+                    <li>Error: "Internal error - failed to read SL layer of a message"</li>
+                    <li>Error: "Internal error - decryption failed at CSecurityLayerEncryptMessageReader:HandleMessage"</li>
+                    <li>Occurs when using MI_Listener and running Vusers over firewall</li>
+                    <li>Connection establishes but immediately fails with decryption error</li>
+                </ul>
+            </div>
+
+            <div class="causes">
+                <h4>Root Causes:</h4>
+                <ul>
+                    <li>Mismatch in security settings between Load Generator and MI_Listener</li>
+                    <li>Certificate/key configuration errors</li>
+                    <li>"Check Client Certificates" or "Private Key Password" settings don't match</li>
+                    <li>Secure connection configuration mismatch</li>
+                </ul>
+            </div>
+
+            <div class="resolution">
+                <h4>Resolution Steps:</h4>
+                <ol>
+                    <li><strong>Verify MI_Listener config:</strong> Check "Check Client Certificates" and "Private Key Password" in MI_Listener configuration</li>
+                    <li><strong>Match LG settings:</strong> Ensure Load Generator Agent configuration has matching "Check Server Certificates" and "Private Key Password"</li>
+                    <li><strong>Test without security:</strong> Temporarily disable "Use Secure Connection" to verify basic connectivity</li>
+                    <li><strong>Verify versions:</strong> Ensure Load Generator, MI_Listener, and Controller are all same version</li>
+                    <li><strong>Regenerate certificates:</strong> If using secure connection, regenerate and redistribute certificates</li>
+                </ol>
+            </div>
+
+            <div class="escalation">
+                <strong>⚠️ Escalate to Core Team if:</strong> Certificate regeneration or MI_Listener reconfiguration is required
+            </div>
+        </div>
+
+        <div class="issue">
+            <h3>Multiple NICs Causing Controller-Load Generator Connectivity Issues <span class="severity severity-high">HIGH</span></h3>
+            
+            <div class="symptoms">
+                <h4>Symptoms:</h4>
+                <ul>
+                    <li>Intermittent connection failures between Controller and Load Generator</li>
+                    <li>Messages appear to be "lost" or not acknowledged</li>
+                    <li>Time-out errors occur randomly</li>
+                    <li>Controller thinks host is not responding</li>
+                </ul>
+            </div>
+
+            <div class="causes">
+                <h4>Root Causes:</h4>
+                <ul>
+                    <li>Machine has multiple Network Interface Cards (NICs)</li>
+                    <li>Messages sent from one NIC but responses expected on another</li>
+                    <li>Communication gets "lost" due to incorrect interface routing</li>
+                    <li>Agent binds to wrong network adapter</li>
+                </ul>
+            </div>
+
+            <div class="resolution">
+                <h4>Resolution Steps:</h4>
+                <ol>
+                    <li><strong>Identify primary NIC:</strong> In Windows, go to Network Connections > Advanced > Advanced Settings > Adapters and Bindings</li>
+                    <li><strong>Reorder adapters:</strong> Move the primary adapter to top of the list</li>
+                    <li><strong>Disable extra NICs:</strong> If possible, disable unused network adapters during testing</li>
+                    <li><strong>Configure specific NIC:</strong> In LoadRunner Agent configuration, specify which NIC to use for communication</li>
+                    <li><strong>Update hosts file:</strong> Add explicit IP-to-hostname mappings for the correct NIC</li>
+                    <li><strong>Test connectivity:</strong> Verify bidirectional communication using the primary interface</li>
+                </ol>
+            </div>
+
+            <div class="note">
+                <strong>💡 Best Practice:</strong> For dedicated Load Generators, disable or remove unused network adapters to avoid routing confusion
+            </div>
+        </div>
+
+        <div class="issue">
+            <h3>Port 54345 Already In Use <span class="severity severity-high">HIGH</span></h3>
+            
+            <div class="symptoms">
+                <h4>Symptoms:</h4>
+                <ul>
+                    <li>LoadRunner Agent fails to start</li>
+                    <li>Error indicates port 54345 is already bound</li>
+                    <li>Cannot connect to Load Generator even though Agent appears to be installed</li>
+                </ul>
+            </div>
+
+            <div class="causes">
+                <h4>Root Causes:</h4>
+                <ul>
+                    <li>Another application using port 54345</li>
+                    <li>Previous LoadRunner Agent process did not terminate cleanly</li>
+                    <li>Zombie process holding the port</li>
+                </ul>
+            </div>
+
+            <div class="resolution">
+                <h4>Resolution Steps:</h4>
+                <ol>
+                    <li><strong>Check port usage:</strong> Run <code>netstat -ano | findstr 54345</code> (Windows) or <code>netstat -an | grep 54345</code> (Linux)</li>
+                    <li><strong>Identify process:</strong> Run <code>netstat -anob</code> (Windows with admin rights) to see which process is using the port</li>
+                    <li><strong>Kill process:</strong> Terminate the process using the port (if safe to do so)</li>
+                    <li><strong>Restart Agent:</strong> Start LoadRunner Agent service again</li>
+                    <li><strong>Reboot if necessary:</strong> If port remains occupied, reboot the machine</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="issue">
+            <h3>Firewall Blocking Required Ports <span class="severity severity-high">HIGH</span></h3>
+            
+            <div class="symptoms">
+                <h4>Symptoms:</h4>
+                <ul>
+                    <li>Cannot connect Controller to Load Generator despite network connectivity</li>
+                    <li>Ping works but LoadRunner connection fails</li>
+                    <li>Connection times out</li>
+                </ul>
+            </div>
+
+            <div class="causes">
+                <h4>Root Causes:</h4>
+                <ul>
+                    <li>Firewall blocking LoadRunner communication ports</li>
+                    <li>Windows Firewall or corporate firewall rules preventing connection</li>
+                    <li>Ports 50500, 54345, or 443 (for firewall mode) blocked</li>
+                </ul>
+            </div>
+
+            <div class="resolution">
+                <h4>Resolution Steps:</h4>
+                <ol>
+                    <li><strong>Test port connectivity:</strong> Use telnet to test ports: <code>telnet [hostname] 54345</code></li>
+                    <li><strong>Check Windows Firewall:</strong> Verify LoadRunner exceptions exist in Windows Firewall</li>
+                    <li><strong>Add firewall rules:</strong> Create inbound rules allowing traffic on:
+                        <ul>
+                            <li>Port 50500 (TCP)</li>
+                            <li>Port 54345 (TCP)</li>
+                            <li>Port 443 (TCP) - if using MI_Listener</li>
+                        </ul>
+                    </li>
+                    <li><strong>Check corporate firewall:</strong> Verify no network-level firewall blocking these ports</li>
+                    <li><strong>Test after changes:</strong> Retry connection after firewall rules are added</li>
+                </ol>
+            </div>
+
+            <div class="escalation">
+                <strong>⚠️ Escalate to Core Team if:</strong> Firewall changes require network security team approval or corporate firewall modifications
+            </div>
+        </div>
+    </div>
+
+    <div id="java-protocol" class="category">
+        <h2>9. Java & Protocol-Specific Issues</h2>
+
+        <div class="issue">
+            <h3><span class="error-badge">Error 22994</span> Unable to Create Java VM <span class="severity severity-high">HIGH</span></h3>
+            
+            <div class="symptoms">
+                <h4>Symptoms:</h4>
+                <ul>
+                    <li>Error: "22994: Error: Unable to create Java VM"</li>
+                    <li>Java Vuser scripts fail to execute</li>
+                    <li>Occurs during script compilation or replay</li>
+                </ul>
+            </div>
+
+            <div class="causes">
+                <h4>Root Causes:</h4>
+                <ul>
+                    <li>PATH environment variable not properly configured for Java</li>
+                    <li>CLASSPATH environment variable missing required entries</li>
+                    <li>JDK not properly installed or configured</li>
+                    <li>Conflicting Java installations</li>
+                </ul>
+            </div>
+
+            <div class="resolution">
+                <h4>Resolution Steps:</h4>
+                <ol>
+                    <li><strong>Set PATH:</strong> Ensure these directories are in PATH:
+                        <ul>
+                            <li><code>[JDK install dir]\bin</code></li>
+                            <li><code>[LoadRunner install dir]\bin</code></li>
+                        </ul>
+                    </li>
+                    <li><strong>Set CLASSPATH:</strong> Ensure these are in CLASSPATH (preferably at beginning):
+                        <ul>
+                            <li><code>[LoadRunner install dir]\classes</code></li>
+                            <li><code>[LoadRunner install dir]\classes\srv</code></li>
+                            <li><code>[JDK install dir]\jre\lib\rt.jar</code></li>
+                        </ul>
+                    </li>
+                    <li><strong>Add application CLASSPATHs:</strong> Include any necessary application class paths</li>
+                    <li><strong>Remove conflicts:</strong> Remove conflicting entries (e.g., QTP Java environment)</li>
+                    <li><strong>Restart LoadRunner:</strong> Close and restart VuGen/Controller for changes to take effect</li>
+                    <li><strong>Apply to Load Generators:</strong> If running remotely, apply same changes to all Load Generators and restart agents</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="issue">
+            <h3><span class="error-badge">Error 22992</span> Can't Find Actions.class <span class="severity severity-medium">MEDIUM</span></h3>
+            
+            <div class="symptoms">
+                <h4>Symptoms:</h4>
+                <ul>
+                    <li>Error: "22992 Can't find Actions.class"</li>
+                    <li>Java script fails to execute</li>
+                    <li>Actions.class file missing from script directory</li>
+                </ul>
+            </div>
+
+            <div class="causes">
+                <h4>Root Causes:</h4>
+                <ul>
+                    <li>Java compilation failed - Actions.class not generated from Actions.java</li>
+                    <li>CLASSPATH or PATH issues preventing compilation</li>
+                    <li>Function within Actions class exceeds JVM 56KB limit</li>
+                    <li>Compilation errors in Actions.java</li>
+                </ul>
+            </div>
+
+            <div class="resolution">
+                <h4>Resolution Steps:</h4>
+                <ol>
+                    <li><strong>Check if file exists:</strong> Look for Actions.class in script directory</li>
+                    <li><strong>If missing, fix environment:</strong> Follow Error 22994 resolution steps</li>
+                    <li><strong>Recompile script:</strong> In VuGen, use Program > Compile to force recompilation</li>
+                    <li><strong>Check for function size:</strong> If function is too large (>56KB):
+                        <ul>
+                            <li>Break large functions into multiple smaller functions</li>
+                            <li>Refactor code to reduce function size</li>
+                        </ul>
+                    </li>
+                    <li><strong>Clean and rebuild:</strong>
+                        <ul>
+                            <li>Delete old initialization files</li>
+                            <li>Run register_vugen.bat from LoadRunner bin directory</li>
+                            <li>Backup and delete vugen.ini from Windows directory</li>
+                            <li>Restart VuGen</li>
+                        </ul>
+                    </li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="issue">
+            <h3>Multiple JDK Versions Required on Same Load Generator <span class="severity severity-medium">MEDIUM</span></h3>
+            
+            <div class="symptoms">
+                <h4>Symptoms:</h4>
+                <ul>
+                    <li>Need to run scripts requiring different JDK versions concurrently</li>
+                    <li>Cannot configure single Load Generator to support multiple JDKs simultaneously</li>
+                </ul>
+            </div>
+
+            <div class="causes">
+                <h4>Root Causes:</h4>
+                <ul>
+                    <li>Different applications/scripts require different Java versions</li>
+                    <li>LoadRunner Agent can only use one JDK at a time</li>
+                </ul>
+            </div>
+
+            <div class="resolution">
+                <h4>Resolution Steps:</h4>
+                <ol>
+                    <li><strong>Use Terminal Services approach:</strong>
+                        <ul>
+                            <li>Launch LoadRunner Agent as a process (not service)</li>
+                            <li>Enable Terminal Services in LoadRunner: Start > Programs > LoadRunner > Advanced Settings > Agent Configuration > Enable Terminal Services</li>
+                            <li>Open different terminal sessions for each JDK environment</li>
+                            <li>Launch separate Agent instances in each terminal session with different JDK paths</li>
+                        </ul>
+                    </li>
+                    <li><strong>Alternative: Multiple Load Generators:</strong> Use separate Load Generator machines for different JDK requirements</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="issue">
+            <h3>JDK Not Found Error in LoadRunner 12.62+ <span class="severity severity-medium">MEDIUM</span></h3>
+            
+            <div class="symptoms">
+                <h4>Symptoms:</h4>
+                <ul>
+                    <li>Error: "JDK not found"</li>
+                    <li>LoadRunner cannot locate installed JDK</li>
+                    <li>Java scripts fail to run</li>
+                </ul>
+            </div>
+
+            <div class="causes">
+                <h4>Root Causes:</h4>
+                <ul>
+                    <li>JDK not installed</li>
+                    <li>LoadRunner not configured with JDK path</li>
+                    <li>Incorrect JDK version</li>
+                    <li>Environment variables not set</li>
+                </ul>
+            </div>
+
+            <div class="resolution">
+                <h4>Resolution Steps:</h4>
+                <ol>
+                    <li><strong>Verify JDK installation:</strong> Confirm JDK (not just JRE) is installed</li>
+                    <li><strong>Configure JDK path:</strong> In VuGen, go to Tools > Options > Environment and set JDK path</li>
+                    <li><strong>Set JAVA_HOME:</strong> Set JAVA_HOME environment variable to JDK installation directory</li>
+                    <li><strong>Verify version compatibility:</strong> Ensure JDK version is compatible with LoadRunner version</li>
+                    <li><strong>Restart VuGen:</strong> Close and restart VuGen after configuration changes</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <div id="infrastructure" class="category">
+        <h2>10. Infrastructure & Resource Issues</h2>
+
+        <div class="issue">
+            <h3>Sessions Hanging in Server After LoadRunner Test Completes <span class="severity severity-medium">MEDIUM</span></h3>
+            
+            <div class="symptoms">
+                <h4>Symptoms:</h4>
+                <ul>
+                    <li>LoadRunner test completes but application sessions remain open</li>
+                    <li>Server Manager shows sessions from LoadRunner user still active</li>
+                    <li>Sessions not properly logged out or cleaned up</li>
+                </ul>
+            </div>
+
+            <div class="causes">
+                <h4>Root Causes:</h4>
+                <ul>
+                    <li>Script does not include proper logout process</li>
+                    <li>Script failures prevent logout from executing</li>
+                    <li>Incomplete session cleanup in application</li>
+                    <li>Script errors cause Vusers to terminate without cleanup</li>
+                </ul>
+            </div>
+
+            <div class="resolution">
+                <h4>Resolution Steps:</h4>
+                <ol>
+                    <li><strong>Add logout to script:</strong> Ensure vuser_end section includes complete logout process</li>
+                    <li><strong>Add browser close:</strong> Include "close browser" at start of script to cleanup previous sessions</li>
+                    <li><strong>Add contingent logout:</strong> Implement error handling that performs logout even if script fails</li>
+                    <li><strong>Use try-finally blocks:</strong> Wrap main actions in try-finally to ensure cleanup code executes</li>
+                    <li><strong>Verify logout completion:</strong> Add verification that logout completed successfully</li>
+                </ol>
+            </div>
+
+            <div class="note">
+                <strong>💡 Best Practice:</strong> Always include cleanup code in vuser_end() section, and use error handling to ensure cleanup runs even if script fails
+            </note>
+        </div>
+
+        <div class="issue">
+            <h3>Process mmdrv.exe Not Created on Remote Host <span class="severity severity-high">HIGH</span></h3>
+            
+            <div class="symptoms">
+                <h4>Symptoms:</h4>
+                <ul>
+                    <li>Error: "Process 'mmdrv.exe' was not created on remote host"</li>
+                    <li>Reason: "communication error"</li>
+                    <li>Agent process/service is running but process cannot be created</li>
+                </ul>
+            </div>
+
+            <div class="causes">
+                <h4>Root Causes:</h4>
+                <ul>
+                    <li>Communication error between Controller and Load Generator</li>
+                    <li>Port binding issues (same as Error -10344)</li>
+                    <li>Insufficient permissions to create processes</li>
+                    <li>Antivirus or security software blocking process creation</li>
+                </ul>
+            </div>
+
+            <div class="resolution">
+                <h4>Resolution Steps:</h4>
+                <ol>
+                    <li><strong>Check Agent log:</strong> Review LoadRunner_agent_startup.log for errors</li>
+                    <li><strong>Verify port availability:</strong> Follow Error -10344 resolution steps</li>
+                    <li><strong>Check permissions:</strong> Ensure LoadRunner Agent has rights to create processes</li>
+                    <li><strong>Review antivirus:</strong> Add LoadRunner directories to antivirus exclusion list</li>
+                    <li><strong>Verify disk space:</strong> Ensure sufficient disk space on Load Generator</li>
+                    <li><strong>Restart Agent:</strong> Stop and restart LoadRunner Agent service</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="issue">
+            <h3>Insufficient Memory on Load Generator <span class="severity severity-high">HIGH</span></h3>
+            
+            <div class="symptoms">
+                <h4>Symptoms:</h4>
+                <ul>
+                    <li>Out of memory errors during test execution</li>
+                    <li>Vusers fail to initialize or crash randomly</li>
+                    <li>Load Generator becomes unresponsive</li>
+                    <li>Test cannot reach target user load</li>
+                </ul>
+            </div>
+
+            <div class="causes">
+                <h4>Root Causes:</h4>
+                <ul>
+                    <li>Too many Vusers allocated to single Load Generator</li>
+                    <li>Insufficient RAM on Load Generator machine</li>
+                    <li>Memory leaks in scripts</li>
+                    <li>Inefficient script design consuming excessive memory</li>
+                </ul>
+            </div>
+
+            <div class="resolution">
+                <h4>Resolution Steps:</h4>
+                <ol>
+                    <li><strong>Monitor resources:</strong> Use Task Manager/Resource Monitor to check memory usage</li>
+                    <li><strong>Reduce Vuser count:</strong> Distribute Vusers across more Load Generators</li>
+                    <li><strong>Optimize scripts:</strong> Review scripts for memory leaks or inefficient memory usage</li>
+                    <li><strong>Enable multithreading:</strong> In Runtime Settings, enable "Run Vuser as a thread" to reduce memory footprint</li>
+                    <li><strong>Increase RAM:</strong> Add more RAM to Load Generator if possible</li>
+                    <li><strong>Close unnecessary applications:</strong> Stop non-essential services on Load Generator</li>
+                </ol>
+            </div>
+
+            <div class="escalation">
+                <strong>⚠️ Escalate to Core Team if:</strong> Additional Load Generators need to be provisioned or hardware upgrades are required
+            </div>
+        </div>
+
+        <div class="issue">
+            <h3>Load Generator Running Out of Disk Space During Test <span class="severity severity-high">HIGH</span></h3>
+            
+            <div class="symptoms">
+                <h4>Symptoms:</h4>
+                <ul>
+                    <li>Test fails mid-execution</li>
+                    <li>Error messages indicate disk full</li>
+                    <li>Result files incomplete or corrupted</li>
+                    <li>Cannot connect to Load Generator after test starts</li>
+                </ul>
+            </div>
+
+            <div class="causes">
+                <h4>Root Causes:</h4>
+                <ul>
+                    <li>Large log files generated during test</li>
+                    <li>Extensive logging enabled in Runtime Settings</li>
+                    <li>Old test results not cleaned up</li>
+                    <li>Insufficient disk space allocated to partition</li>
+                </ul>
+            </div>
+
+            <div class="resolution">
+                <h4>Resolution Steps:</h4>
+                <ol>
+                    <li><strong>Check available space:</strong> Monitor disk space before starting tests</li>
+                    <li><strong>Reduce logging:</strong> In Runtime Settings > Log:
+                        <ul>
+                            <li>Set logging level to "Brief" or "Send messages only when error occurs"</li>
+                            <li>Disable extended logging unless debugging</li>
+                        </ul>
+                    </li>
+                    <li><strong>Clean temp directories:</strong> Delete old files from LoadRunner temp folder</li>
+                    <li><strong>Archive old results:</strong> Move or delete results from previous test runs</li>
+                    <li><strong>Allocate more space:</strong> Increase disk space if tests regularly run out</li>
+                </ol>
+            </div>
+
+            <div class="note">
+                <strong>💡 Prevention:</strong> Calculate expected result size (approximately 1-2 MB per Vuser-hour) and ensure 2-3x that space is available before starting tests
+            </div>
+        </div>
+
+        <div class="issue">
+            <h3>Network Latency Issues During Test Execution <span class="severity severity-medium">MEDIUM</span></h3>
+            
+            <div class="symptoms">
+                <h4>Symptoms:</h4>
+                <ul>
+                    <li>Unusually high response times</li>
+                    <li>Timeouts during test execution</li>
+                    <li>Results inconsistent with application performance</li>
+                    <li>Load Generators report network errors</li>
+                </ul>
+            </div>
+
+            <div class="causes">
+                <h4>Root Causes:</h4>
+                <ul>
+                    <li>Network congestion between Load Generators and application</li>
+                    <li>Firewall or proxy introducing latency</li>
+                    <li>DNS resolution delays</li>
+                    <li>Network infrastructure issues</li>
+                </ul>
+            </div>
+
+            <div class="resolution">
+                <h4>Resolution Steps:</h4>
+                <ol>
+                    <li><strong>Measure actual network latency:</strong> Use ping and traceroute to measure latency</li>
+                    <li><strong>Check network utilization:</strong> Monitor network bandwidth usage during test</li>
+                    <li><strong>Use DNS cache:</strong> In Runtime Settings > DNS Caching, enable DNS caching</li>
+                    <li><strong>Adjust timeouts:</strong> Increase timeout values in Runtime Settings if network latency is expected</li>
+                    <li><strong>Use connection pooling:</strong> Enable "Simulate browser cache" and "Keep-Alive" to reduce connection overhead</li>
+                    <li><strong>Test from different location:</strong> Try running from Load Generators closer to application</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="issue">
+            <h3>Controller Becomes Unresponsive During Large Test <span class="severity severity-high">HIGH</span></h3>
+            
+            <div class="symptoms">
+                <h4>Symptoms:</h4>
+                <ul>
+                    <li>Controller UI freezes or becomes very slow</li>
+                    <li>Cannot interact with Controller during test execution</li>
+                    <li>High CPU usage on Controller machine</li>
+                    <li>Memory usage continuously increasing</li>
+                </ul>
+            </div>
+
+            <div class="causes">
+                <h4>Root Causes:</h4>
+                <ul>
+                    <li>Too many Vusers being managed by single Controller</li>
+                    <li>Excessive monitoring and graphing</li>
+                    <li>Controller machine under-spec'd for test size</li>
+                    <li>Real-time results updating overwhelming system</li>
+                </ul>
+            </div>
+
+            <div class="resolution">
+                <h4>Resolution Steps:</h4>
+                <ol>
+                    <li><strong>Reduce real-time monitoring:</strong> Minimize number of open graphs during test</li>
+                    <li><strong>Disable auto-refresh:</strong> Turn off automatic refresh of graphs during execution</li>
+                    <li><strong>Reduce granularity:</strong> Increase polling interval for monitors</li>
+                    <li><strong>Use LoadRunner Enterprise:</strong> For very large tests, use LoadRunner Enterprise instead of standalone Controller</li>
+                    <li><strong>Upgrade Controller hardware:</strong> Ensure Controller machine meets requirements for test size</li>
+                    <li><strong>Distribute load:</strong> Split tests across multiple scenarios if possible</li>
+                </ol>
+            </div>
+
+            <div class="escalation">
+                <strong>⚠️ Escalate to Core Team if:</strong> Controller hardware needs upgrade or LoadRunner Enterprise deployment is required
+            </div>
+        </div>
+    </div>
+
+    <div style="background: #667eea; color: white; padding: 30px; text-align: center; border-radius: 10px; margin-top: 40px;">
+        <h2 style="margin: 0 0 10px 0;">Need More Help?</h2>
+        <p style="margin: 0; font-size: 1.1em;">If the issue is not resolved using this guide, escalate to the LoadRunner Enterprise Core Admin Team</p>
+    </div>
+
+    <div style="text-align: center; padding: 20px; color: #999; font-size: 0.9em;">
+        <p>LoadRunner Enterprise Support Assistant - Troubleshooting Guide</p>
+        <p>Last Updated: January 2025</p>
+    </div>
+</body>
+</html>
